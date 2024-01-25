@@ -1,0 +1,25 @@
+name: smart_home
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.5 <4.0.0'
+
+dependencies:
+  equatable: ^2.0.5
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.4.1
+  freezed_annotation: ^2.4.1
+  mqtt_client: ^10.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  build_runner: ^2.4.6
+  freezed: ^2.4.3
+
+flutter:
+  uses-material-design: true
