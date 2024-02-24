@@ -33,6 +33,11 @@ class MainApp extends ConsumerWidget {
                       item.name,
                       maxLines: 1,
                     ),
+                    trailing: Image(
+                      image: AssetImage(
+                        "assets/images/blinds_${item.rollerPos < 10 ? "closed" : item.rollerPos > 90 ? "opened" : "half"}.png",
+                      ),
+                    ),
                     subtitle: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
