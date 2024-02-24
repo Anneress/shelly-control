@@ -29,8 +29,11 @@ class MainApp extends ConsumerWidget {
                 return Card(
                   color: item.isOnline ? null : Theme.of(context).disabledColor,
                   child: ListTile(
-                    title: Text(item.name),
-                    trailing: Row(
+                    title: Text(
+                      item.name,
+                      maxLines: 1,
+                    ),
+                    subtitle: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         switch (item.rollerStatus) {
