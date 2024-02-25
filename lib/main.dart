@@ -17,88 +17,185 @@ class MainApp extends ConsumerWidget {
         useMaterial3: true,
       ),
       home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Smart Home'),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(18),
-            child: ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final item = messages.values.elementAt(index);
-                return Card(
-                  color: item.isOnline ? null : Theme.of(context).disabledColor,
-                  child: ListTile(
-                    title: Text(
-                      item.name,
-                      maxLines: 1,
-                    ),
-                    trailing: Image(
-                      image: AssetImage(
-                        "assets/images/blinds_${item.rollerPos < 10 ? "closed" : item.rollerPos > 90 ? "opened" : "half"}.png",
+        appBar: AppBar(
+          title: const Text('Smart Home'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(18),
+          child: ListView.builder(
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final item = messages.values.elementAt(index);
+              return Card(
+                color: item.isOnline ? null : Theme.of(context).disabledColor,
+                child: ListTile(
+                  title: Text(
+                    item.name,
+                    maxLines: 1,
+                  ),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "${item.rollerPos}%",
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                    ),
-                    subtitle: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        switch (item.rollerStatus) {
-                          Shelly25RollerStatus.close => IconButton.outlined(
-                              icon: const Icon(Icons.pause),
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () => ref
-                                  .read(shelliesProvider.notifier)
-                                  .stopRoller(item.name),
-                            ),
-                          _ => IconButton(
-                              onPressed: () => ref
-                                  .read(shelliesProvider.notifier)
-                                  .closeRoller(item.name),
-                              icon:
-                                  const Icon(Icons.keyboard_arrow_down_rounded),
-                            ),
-                        },
-                        SizedBox(
-                          width: 150,
-                          child: Slider(
-                            label: item.rollerPos.toString(),
-                            min: 0,
-                            max: 100,
-                            divisions: 4,
-                            value: item.rollerPos.toDouble(),
-                            onChangeEnd: (value) => ref
-                                .read(shelliesProvider.notifier)
-                                .setRollerPosition(item.name, value.toInt()),
-                            onChanged: (value) => debugPrint(value.toString()),
-                          ),
+                      Image(
+                        height: 150,
+                        image: AssetImage(
+                          "assets/images/blinds_${item.rollerPos < 10 ? "closed" : item.rollerPos > 90 ? "opened" : "half"}.png",
                         ),
-                        switch (item.rollerStatus) {
-                          Shelly25RollerStatus.open => IconButton.outlined(
-                              icon: const Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.pause_rounded),
-                                  Text('Auf'),
-                                ],
-                              ),
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () => ref
-                                  .read(shelliesProvider.notifier)
-                                  .stopRoller(item.name),
-                            ),
-                          _ => IconButton(
-                              icon: const Icon(Icons.keyboard_arrow_up_rounded),
-                              onPressed: () => ref
-                                  .read(shelliesProvider.notifier)
-                                  .openRoller(item.name),
-                            )
-                        },
-                      ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.keyboard_arrow_up_rounded),
+                            onPressed: () => ref
+                                .read(shelliesProvider.notifier)
+                                .openRoller(item.name),
+                          ),
+                          Container(
+                            height: 8,
+                            width: 2,
+                            color: Theme.of(context).dividerColor,
+                            margin: const EdgeInsets.symmetric(vertical: 2),
+                          ),
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.pause),
+                            onPressed: () => ref
+                                .read(shelliesProvider.notifier)
+                                .stopRoller(item.name),
+                          ),
+                          Container(
+                            height: 8,
+                            width: 2,
+                            color: Theme.of(context).dividerColor,
+                            margin: const EdgeInsets.symmetric(vertical: 2),
+                          ),
+                          IconButton.filledTonal(
+                            onPressed:
+                                item.rollerStatus == Shelly25RollerStatus.close
+                                    ? null
+                                    : () => ref
+                                        .read(shelliesProvider.notifier)
+                                        .closeRoller(item.name),
+                            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  onLongPress: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RollerControlPage(item: item),
                     ),
                   ),
-                );
-              },
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RollerControlPage extends ConsumerWidget {
+  const RollerControlPage({required this.item, super.key});
+
+  final Shelly25 item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(item.name),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "${item.rollerPos}%",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Image(
+                image: AssetImage(
+                  "assets/images/blinds_${item.rollerPos < 10 ? "closed" : item.rollerPos > 90 ? "opened" : "half"}.png",
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton.filledTonal(
+                    icon: const Icon(Icons.keyboard_arrow_up_rounded),
+                    onPressed: () => ref
+                        .read(shelliesProvider.notifier)
+                        .openRoller(item.name),
+                  ),
+                  Container(
+                    height: 8,
+                    width: 2,
+                    color: Theme.of(context).dividerColor,
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                  ),
+                  IconButton.filledTonal(
+                    icon: const Icon(Icons.pause),
+                    onPressed: () => ref
+                        .read(shelliesProvider.notifier)
+                        .stopRoller(item.name),
+                  ),
+                  Container(
+                    height: 8,
+                    width: 2,
+                    color: Theme.of(context).dividerColor,
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                  ),
+                  IconButton.filledTonal(
+                    onPressed: item.rollerStatus == Shelly25RollerStatus.close
+                        ? null
+                        : () => ref
+                            .read(shelliesProvider.notifier)
+                            .closeRoller(item.name),
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                const Text("Close"),
+                Expanded(
+                  child: Slider(
+                    label: item.rollerPos.toString(),
+                    min: 0,
+                    max: 100,
+                    divisions: 4,
+                    value: item.rollerPos.toDouble(),
+                    onChangeEnd: (value) => ref
+                        .read(shelliesProvider.notifier)
+                        .setRollerPosition(item.name, value.toInt()),
+                    onChanged: (value) => debugPrint(value.toString()),
+                  ),
+                ),
+                const Text("Open"),
+              ],
             ),
-          )),
+          ),
+        ],
+      ),
     );
   }
 }
