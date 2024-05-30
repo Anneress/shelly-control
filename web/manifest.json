@@ -1,6 +1,6 @@
 {
-    "name": "smart_home",
-    "short_name": "smart_home",
+    "name": "shelly_control",
+    "short_name": "shelly_control",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
