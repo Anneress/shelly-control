@@ -8,7 +8,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 
 final mqttClient = Provider<MqttClient>((ref) {
   final client =
-      MqttBrowserClient("ws://192.168.188.77", Random.secure().toString());
+      MqttBrowserClient("ws://${Uri.base.host}", Random.secure().toString());
 
   client.port = 8080;
   client.onConnected = () => client.subscribe("#", MqttQos.atLeastOnce);
